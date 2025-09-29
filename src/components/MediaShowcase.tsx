@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, Video, Edit, Eye, EyeOff, DollarSign, Link2, Timer, Trash2, Crown, RotateCcw, ImageIcon, ChevronDown, ChevronUp, ChevronRight, Heart, Share2, MousePointer, Pin, PlayCircle, Shuffle, Gift, MessageCircle, X, Store } from "lucide-react";
+import { Upload, Video, Edit, Eye, EyeOff, DollarSign, Link2, Timer, Trash2, Crown, RotateCcw, ImageIcon, ChevronDown, ChevronUp, ChevronRight, Heart, Share2, MousePointer, Pin, PlayCircle, Shuffle, Gift, MessageCircle, X } from "lucide-react";
 import { toast } from "sonner";
 import { MediaTimerDialog } from "./MediaTimerDialog";
 import { QuickAutoDeleteDialog } from "./QuickAutoDeleteDialog";
@@ -164,7 +164,6 @@ export const MediaShowcase = React.memo(({
   const [showSlotConfirmDialog, setShowSlotConfirmDialog] = useState(false);
   const [showGiftGallery, setShowGiftGallery] = useState(false);
   const [purchasedContentMinimized, setPurchasedContentMinimized] = useState(false);
-  const [showVitrine, setShowVitrine] = useState(true);
   const [slotConfirmData, setSlotConfirmData] = useState<{
     type: 'image' | 'video';
     cost: number;
@@ -985,7 +984,7 @@ export const MediaShowcase = React.memo(({
       </div>
 
       {/* Media Showcase - Only show if showVitrine is enabled and chat overlay is closed */}
-      {(visibilitySettings?.showVitrine ?? visibilitySettingsFromHook.showVitrine) && !showChatOverlay && showVitrine && <Card className={`p-4 relative bg-white/10 backdrop-blur-xl border border-white/30 shadow-2xl rounded-2xl ${vitrineConfig.hasGlassEffect ? 'backdrop-blur-md border-white/20' : ''}`} style={{
+      {(visibilitySettings?.showVitrine ?? visibilitySettingsFromHook.showVitrine) && !showChatOverlay && <Card className={`p-4 relative bg-white/10 backdrop-blur-xl border border-white/30 shadow-2xl rounded-2xl ${vitrineConfig.hasGlassEffect ? 'backdrop-blur-md border-white/20' : ''}`} style={{
       backgroundColor: vitrineConfig.backgroundColor === "transparent" ? "transparent" : vitrineConfig.backgroundColor
     }}>
         <div className="flex justify-between items-center mb-4">
@@ -1679,19 +1678,6 @@ export const MediaShowcase = React.memo(({
             });
           }}
         />
-        
-        {/* Ícone de Vitrine - Aparece quando chat vitrine está ativado */}
-        {showChatOverlay && (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setShowVitrine(!showVitrine)}
-            className="h-10 w-10 p-0 rounded-full border-2 border-primary/20 bg-background/90 backdrop-blur-sm hover:bg-primary/10 hover:border-primary/40 transition-all duration-200"
-            title={showVitrine ? "Ocultar Vitrine" : "Mostrar Vitrine"}
-          >
-            <Store className="w-4 h-4" />
-          </Button>
-        )}
       </div>
     </div>;
 });

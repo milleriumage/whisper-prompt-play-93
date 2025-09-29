@@ -2316,3 +2316,64 @@ body {
   left: 16rem;
   width: calc(100% - 16rem);
 }
+
+/* Main screen heights with proper z-index layering */
+.main-screen-full { 
+  height: 100vh !important; 
+  z-index: 50 !important; 
+  position: relative !important;
+}
+
+.main-screen-extra-large { 
+  height: 90vh !important; 
+  z-index: 50 !important; 
+  position: relative !important;
+}
+
+.main-screen-large { 
+  height: 80vh !important; 
+  z-index: 50 !important; 
+  position: relative !important;
+}
+
+.main-screen-medium-large { 
+  height: 70vh !important; 
+  z-index: 50 !important; 
+  position: relative !important;
+}
+
+.main-screen-above-half { 
+  height: 60vh !important; 
+  z-index: 50 !important; 
+  position: relative !important;
+}
+
+.main-screen-half { 
+  height: 50vh !important; 
+  z-index: 50 !important; 
+  position: relative !important;
+}
+
+.main-screen-small-half { 
+  height: 40vh !important; 
+  z-index: 50 !important; 
+  position: relative !important;
+}
+
+.main-screen-small { 
+  height: 30vh !important; 
+  z-index: 50 !important; 
+  position: relative !important;
+}
+
+.main-screen-minimal { 
+  height: 20vh !important; 
+  z-index: 50 !important; 
+  position: relative !important;
+}
+
+.main-screen-current { 
+  height: auto !important; 
+  z-index: 50 !important; 
+  position: relative !important;
+}

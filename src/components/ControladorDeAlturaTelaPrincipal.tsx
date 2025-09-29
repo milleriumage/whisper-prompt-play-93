@@ -1,10 +1,11 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { Monitor, Maximize2, Minimize2, MoveVertical, RotateCcw, ArrowUp, ArrowDown, ChevronsUp, ChevronsDown, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { usePerformanceOptimization } from '@/hooks/usePerformanceOptimization';
+import { toast } from "sonner";
 
 export type HeightOption = {
   id: string;
@@ -28,6 +29,7 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
   const isMobile = useIsMobile();
   const { throttle } = usePerformanceOptimization();
   const [currentOptionIndex, setCurrentOptionIndex] = useState(9); // Start with "Atual" (index 9)
+  const [isOpen, setIsOpen] = useState(false);
   const lastClickTime = useRef(0);
   const isProcessing = useRef(false);
   
@@ -108,87 +110,134 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
 
   // Optimized height change with smooth throttling
   const optimizedHeightChange = useCallback(
-    throttle((height: string) => {
-      console.log(`🎛️ Height Controller: Applying height change to ${height} (${heightOptions.find(opt => opt.height === height)?.name})`);
+    throttle((height: string, optionName: string) => {
+      console.log(`🎛️ Height Controller: Applying height change to ${height} (${optionName})`);
       onHeightChange(height);
       isProcessing.current = false;
-    }, 150),
+    }, 100),
     [onHeightChange, throttle]
   );
 
-  const handleCycleHeight = useCallback(() => {
+  const handleHeightSelect = useCallback((option: HeightOption, index: number) => {
     const now = Date.now();
     
     // Prevent rapid clicks
-    if (now - lastClickTime.current < 200 || isProcessing.current) return;
+    if (now - lastClickTime.current < 150 || isProcessing.current) return;
     
     lastClickTime.current = now;
     isProcessing.current = true;
     
-    const nextIndex = (currentOptionIndex + 1) % heightOptions.length;
-    const nextOption = heightOptions[nextIndex];
+    setCurrentOptionIndex(index);
+    setIsOpen(false);
+    optimizedHeightChange(option.height, option.name);
     
-    console.log(`🎛️ Height Controller: Changing from ${currentOption.name} to ${nextOption.name} (${nextOption.height})`);
-    
-    setCurrentOptionIndex(nextIndex);
-    optimizedHeightChange(nextOption.height);
-  }, [currentOptionIndex, heightOptions, currentOption.name, optimizedHeightChange]);
+    if (option.name === 'Atual') {
+      toast.success(`📐 Altura da tela resetada para o padrão`);
+    } else {
+      toast.success(`📐 Altura alterada para ${option.name}`);
+    }
+  }, [optimizedHeightChange]);
 
   const IconComponent = currentOption.icon;
-
-  const isCurrentlyProcessing = isProcessing.current;
-  const baseClasses = `h-10 w-10 md:h-12 md:w-12 rounded-full shadow-lg bg-gradient-to-br from-primary/90 to-primary/70 hover:from-primary hover:to-primary/80 backdrop-blur-sm border border-white/20 transition-all duration-200 hover:scale-105 active:scale-95 ${isCurrentlyProcessing ? 'opacity-70' : 'opacity-100'}`;
+  const baseClasses = `h-10 w-10 md:h-12 md:w-12 rounded-full shadow-lg bg-gradient-to-br from-primary/90 to-primary/70 hover:from-primary hover:to-primary/80 backdrop-blur-sm border border-white/20 transition-all duration-200 hover:scale-105 active:scale-95`;
 
   if (position === 'relative') {
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              onClick={handleCycleHeight}
-              size="sm"
-              disabled={false}
-              className={cn(baseClasses, "animate-fade-in", className)}
-            >
-              <IconComponent size={16} className="text-primary-foreground md:w-5 md:h-5" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="left" sideOffset={8} className="max-w-48">
-            <div className="space-y-1">
-              <p className="font-medium">{currentOption.name}</p>
-              <p className="text-xs text-muted-foreground">{currentOption.description}</p>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn(baseClasses, "animate-fade-in", className)}
+          >
+            <IconComponent size={16} className="text-primary-foreground md:w-5 md:h-5" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-64 p-2" align="end">
+          <div className="space-y-1">
+            <div className="px-2 py-1.5">
+              <h4 className="text-sm font-semibold">Altura da Tela:</h4>
+              <p className="text-xs text-muted-foreground">
+                Escolha o tamanho da altura
+              </p>
             </div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+            <div className="space-y-1">
+              {heightOptions.map((option, index) => {
+                const OptionIcon = option.icon;
+                return (
+                  <Button
+                    key={option.id}
+                    variant={currentOptionIndex === index ? "secondary" : "ghost"}
+                    className="w-full justify-start px-2 py-1.5 h-auto"
+                    onClick={() => handleHeightSelect(option, index)}
+                  >
+                    <div className="flex items-center gap-3 w-full">
+                      <OptionIcon className="w-4 h-4" />
+                      <div className="flex-1 text-left">
+                        <div className="text-sm font-medium">{option.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {option.description}
+                        </div>
+                      </div>
+                    </div>
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
     );
   }
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            onClick={handleCycleHeight}
-            size="lg"
-            disabled={false}
-            className={cn(
-              "fixed bottom-20 right-4 z-50",
-              baseClasses,
-              "animate-fade-in",
-              className
-            )}
-          >
-            <IconComponent size={20} className="text-primary-foreground" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent side="left" sideOffset={8} className="max-w-48">
-          <div className="space-y-1">
-            <p className="font-medium">{currentOption.name}</p>
-            <p className="text-xs text-muted-foreground">{currentOption.description}</p>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          size="lg"
+          className={cn(
+            "fixed bottom-20 right-4 z-[60]",
+            baseClasses,
+            "animate-fade-in",
+            className
+          )}
+        >
+          <IconComponent size={20} className="text-primary-foreground" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-2" align="end" side="left">
+        <div className="space-y-1">
+          <div className="px-2 py-1.5">
+            <h4 className="text-sm font-semibold">Altura da Tela:</h4>
+            <p className="text-xs text-muted-foreground">
+              Escolha o tamanho da altura
+            </p>
           </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+          <div className="space-y-1">
+            {heightOptions.map((option, index) => {
+              const OptionIcon = option.icon;
+              return (
+                <Button
+                  key={option.id}
+                  variant={currentOptionIndex === index ? "secondary" : "ghost"}
+                  className="w-full justify-start px-2 py-1.5 h-auto"
+                  onClick={() => handleHeightSelect(option, index)}
+                >
+                  <div className="flex items-center gap-3 w-full">
+                    <OptionIcon className="w-4 h-4" />
+                    <div className="flex-1 text-left">
+                      <div className="text-sm font-medium">{option.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {option.description}
+                      </div>
+                    </div>
+                  </div>
+                </Button>
+              );
+            })}
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 };

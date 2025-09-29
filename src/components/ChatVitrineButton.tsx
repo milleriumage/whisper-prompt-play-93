@@ -369,10 +369,10 @@ export const ChatVitrineButton: React.FC<ChatVitrineButtonProps> = ({
         </Tooltip>
       </TooltipProvider>
 
-      {/* Enhanced Chat Overlay - Fixed at clicked position */}
+      {/* Chat Fixado - Aparece apenas na posição do clique, sem popup */}
       {showChatOverlay && (
         <div 
-          className="fixed z-50"
+          className="fixed z-50 pointer-events-auto"
           style={{
             left: `${chatPosition.x}px`,
             top: `${chatPosition.y}px`,
@@ -424,20 +424,12 @@ export const ChatVitrineButton: React.FC<ChatVitrineButtonProps> = ({
                 <Button 
                   size="sm" 
                   variant="ghost" 
-                  onClick={centerWindow} 
-                  className="h-6 w-6 p-0 rounded-full hover:bg-primary/10 transition-colors"
-                  title="Centralizar"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                </Button>
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
                   onClick={() => {
                     setShowChatOverlay(false);
                     onToggle?.(false);
                   }} 
                   className="h-6 w-6 p-0 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors"
+                  title="Fechar Chat Vitrine"
                 >
                   <X className="w-3 h-3" />
                 </Button>

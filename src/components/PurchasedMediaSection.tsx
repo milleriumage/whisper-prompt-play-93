@@ -7,14 +7,16 @@ import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { VideoThumbnail } from './VideoThumbnail';
-
 interface PurchasedMediaSectionProps {
   onSetAsMain?: (mediaId: string) => void;
 }
-
-export const PurchasedMediaSection = ({ onSetAsMain }: PurchasedMediaSectionProps = {}) => {
-  const { unlockedMedia, isLoading } = useUserUnlocks();
-
+export const PurchasedMediaSection = ({
+  onSetAsMain
+}: PurchasedMediaSectionProps = {}) => {
+  const {
+    unlockedMedia,
+    isLoading
+  } = useUserUnlocks();
   const handleActivateMainscreen = (unlock: any) => {
     if (unlock.media_items && onSetAsMain) {
       onSetAsMain(unlock.media_items.id);
@@ -23,24 +25,11 @@ export const PurchasedMediaSection = ({ onSetAsMain }: PurchasedMediaSectionProp
       toast.info("🔄 Ativando mídia na tela principal...");
     }
   };
-
   if (isLoading) {
-    return (
-      <Card className="p-4 border border-gray-200">
-        <div className="flex items-center gap-2 mb-3">
-          <ShoppingBag className="w-5 h-5 text-green-600" />
-          <h3 className="text-lg font-semibold text-gray-700">Meu Conteúdo Comprado</h3>
-        </div>
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-        </div>
-      </Card>
-    );
+    return;
   }
-
   if (unlockedMedia.length === 0) {
-    return (
-      <Card className="p-4 border border-gray-200">
+    return <Card className="p-4 border border-gray-200">
         <div className="flex items-center gap-2 mb-3">
           <ShoppingBag className="w-5 h-5 text-green-600" />
           <h3 className="text-lg font-semibold text-gray-700">Meu Conteúdo Comprado</h3>
@@ -50,12 +39,9 @@ export const PurchasedMediaSection = ({ onSetAsMain }: PurchasedMediaSectionProp
           <p>Você ainda não comprou nenhum conteúdo</p>
           <p className="text-sm">Quando fizer uma compra, o conteúdo aparecerá aqui</p>
         </div>
-      </Card>
-    );
+      </Card>;
   }
-
-  return (
-    <Card className="p-4 border border-gray-200">
+  return <Card className="p-4 border border-gray-200">
       <div className="flex items-center gap-2 mb-3">
         <ShoppingBag className="w-5 h-5 text-green-600" />
         <h3 className="text-lg font-semibold text-gray-700">Meu Conteúdo Comprado</h3>
@@ -65,41 +51,20 @@ export const PurchasedMediaSection = ({ onSetAsMain }: PurchasedMediaSectionProp
       </div>
       
       <div className="space-y-3">
-        {unlockedMedia.map((unlock) => {
-          const media = unlock.media_items;
-          if (!media) return null;
-
-          const expiresAt = new Date(unlock.expires_at);
-          const timeUntilExpiry = formatDistanceToNow(expiresAt, { 
-            addSuffix: true, 
-            locale: ptBR 
-          });
-
-          return (
-            <div 
-              key={unlock.id} 
-              className="flex items-center gap-3 p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-              onClick={() => handleActivateMainscreen(unlock)}
-            >
+        {unlockedMedia.map(unlock => {
+        const media = unlock.media_items;
+        if (!media) return null;
+        const expiresAt = new Date(unlock.expires_at);
+        const timeUntilExpiry = formatDistanceToNow(expiresAt, {
+          addSuffix: true,
+          locale: ptBR
+        });
+        return <div key={unlock.id} className="flex items-center gap-3 p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleActivateMainscreen(unlock)}>
               {/* Preview da mídia com thumbnail otimizada - Mobile First */}
               <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-lg overflow-hidden bg-gray-100 relative group">
-                {media.type === 'video' ? (
-                  <VideoThumbnail
-                    src={media.storage_path}
-                    alt={media.name || 'Conteúdo comprado'}
-                    className="w-full h-full"
-                    showPlayButton={true}
-                  />
-                ) : (
-                  <img 
-                    src={getMediaUrl(media.storage_path)} 
-                    alt={media.name || 'Conteúdo comprado'} 
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/placeholder.svg';
-                    }}
-                  />
-                )}
+                {media.type === 'video' ? <VideoThumbnail src={media.storage_path} alt={media.name || 'Conteúdo comprado'} className="w-full h-full" showPlayButton={true} /> : <img src={getMediaUrl(media.storage_path)} alt={media.name || 'Conteúdo comprado'} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" onError={e => {
+              (e.target as HTMLImageElement).src = '/placeholder.svg';
+            }} />}
               </div>
 
               {/* Informações da mídia - Responsivo para mobile */}
@@ -107,11 +72,9 @@ export const PurchasedMediaSection = ({ onSetAsMain }: PurchasedMediaSectionProp
                 <h4 className="font-medium text-gray-900 truncate text-sm sm:text-base">
                   {media.name || 'Conteúdo Premium'}
                 </h4>
-                {media.description && (
-                  <p className="text-xs sm:text-sm text-gray-600 truncate mt-0.5">
+                {media.description && <p className="text-xs sm:text-sm text-gray-600 truncate mt-0.5">
                     {media.description}
-                  </p>
-                )}
+                  </p>}
                 
                 {/* Informações da compra - Otimizadas para mobile */}
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-1 text-xs text-gray-500">
@@ -129,25 +92,15 @@ export const PurchasedMediaSection = ({ onSetAsMain }: PurchasedMediaSectionProp
               {/* Tipo de mídia e ações - Responsivo */}
               <div className="flex-shrink-0 flex flex-col sm:flex-row items-center gap-2">
                 {/* Crown icon clickable para ativar mainscreen */}
-                <div 
-                  className="cursor-pointer hover:scale-110 transition-transform p-1"
-                  onClick={() => handleActivateMainscreen(unlock)}
-                  title="Ativar na tela principal"
-                >
+                <div className="cursor-pointer hover:scale-110 transition-transform p-1" onClick={() => handleActivateMainscreen(unlock)} title="Ativar na tela principal">
                   <Crown className="w-5 h-5 sm:w-4 sm:h-4 text-yellow-600 hover:text-yellow-500 transition-colors" />
                 </div>
-                <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
-                  media.type === 'video' 
-                    ? 'bg-blue-100 text-blue-800' 
-                    : 'bg-purple-100 text-purple-800'
-                }`}>
+                <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${media.type === 'video' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}`}>
                   {media.type === 'video' ? '🎥 Vídeo' : '🖼️ Imagem'}
                 </span>
               </div>
-            </div>
-          );
-        })}
+            </div>;
+      })}
       </div>
-    </Card>
-  );
+    </Card>;
 };

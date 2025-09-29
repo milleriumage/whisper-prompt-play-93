@@ -1515,19 +1515,7 @@ export const MediaShowcase = React.memo(({
           </div>}
       </Card>}
 
-    {/* Chat Overlay - Show when showChatOverlay is true */}
-      {showChatOverlay && <Card className="p-4 bg-card border">
-          <EnhancedChat messages={messages || []} onSendMessage={onSendMessage || (() => {})} onEditMessage={(message: any) => {
-        // Mesma funcionalidade do chat principal - apenas criadores podem editar
-        toast({
-          title: "🔒 Apenas criadores podem editar mensagens!",
-          variant: "destructive"
-        });
-      }} passwordProtected={false} onPasswordVerify={() => {}} creatorId={creatorId} visibilitySettings={{
-        showChatEditing: true,
-        showChatCloseIcon: true
-      }} />
-        </Card>}
+    {/* Chat Overlay - Removido porque o ChatVitrineButton já gerencia o chat fixado */}
 
       {/* Dialogs */}
       <MediaTimerDialog isOpen={showTimerDialog} onClose={() => {

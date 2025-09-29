@@ -58,6 +58,7 @@ import { useVisibilitySettings } from "@/hooks/useVisibilitySettings";
 import { VisibilityTestComponent } from "@/components/VisibilityTestComponent";
 import { CheckoutTransparenteDialog } from "@/components/CheckoutTransparenteDialog";
 import { TrialTimer } from "@/components/TrialTimer";
+import { useHeightController } from "@/hooks/useHeightController";
 import { useTrialStatus } from "@/hooks/useTrialStatus";
 import { Monitor } from "lucide-react";
 import PixPaymentDialog from "@/components/PixPaymentDialog";
@@ -713,18 +714,9 @@ const Index = () => {
   const [showSocialDialog, setShowSocialDialog] = useState(false); // Dialog para adicionar redes sociais
   const [showVisibilityDialog, setShowVisibilityDialog] = useState(false); // Dialog para configurações de visibilidade
   const [purchasedContentMinimized, setPurchasedContentMinimized] = useState(false); // Estado para minimizar conteúdo comprado
-  const [mainScreenHeight, setMainScreenHeight] = useState('auto'); // Height controller state
   
-  // Wrapper function for height changes with debugging
-  const handleMainScreenHeightChange = (newHeight: string) => {
-    console.log(`📐 Index.tsx: Main screen height changing from ${mainScreenHeight} to ${newHeight}`);
-    setMainScreenHeight(newHeight);
-  };
-  
-  // Monitor main screen height changes
-  useEffect(() => {
-    console.log(`📐 Index.tsx: Main screen height updated to: ${mainScreenHeight}`);
-  }, [mainScreenHeight]);
+  // Height controller hook
+  const { mainScreenHeight, isChanging: heightChanging, handleHeightChange } = useHeightController('auto');
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -1259,7 +1251,7 @@ const Index = () => {
               
               {/* Height Controller Button */}
               <ControladorDeAlturaTelaPrincipal 
-                onHeightChange={handleMainScreenHeightChange}
+                onHeightChange={handleHeightChange}
                 position="relative"
                 className="ml-2"
               />
@@ -1289,10 +1281,15 @@ const Index = () => {
         </div>
 
         {visibilitySettings.showMainMediaDisplay && <>
-            <div className="relative w-screen fixed inset-0 flex items-center justify-center overflow-hidden" 
+            <div className={`relative w-screen flex items-center justify-center overflow-hidden height-controller-container ${
+                mainScreenHeight === 'auto' ? 'auto-height' : 'fixed-height'
+              } ${heightChanging ? 'opacity-90' : ''}`} 
               style={{
                 height: mainScreenHeight === 'auto' ? '100vh' : mainScreenHeight,
-                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)' // Smoother transition
+                width: '100vw',
+                top: mainScreenHeight === 'auto' ? '0' : '50%',
+                left: '50%',
+                transform: mainScreenHeight === 'auto' ? 'none' : 'translate(-50%, -50%)'
               }}>
               {/* Timer principal no canto superior quando ativo */}
               {isTimerRunning && timer > 0 && <div className={`absolute top-4 left-4 z-30 rounded-lg px-4 py-2 border shadow-lg ${timerTransparentBg ? 'bg-transparent border-white/40' : 'bg-black/80 backdrop-blur-sm border-white/20'}`}>

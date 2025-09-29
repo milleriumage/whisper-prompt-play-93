@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Monitor, Maximize2, Minimize2, MoveVertical, RotateCcw } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Monitor, Maximize2, Minimize2, MoveVertical, RotateCcw, ArrowUp, ArrowDown, ChevronsUp, ChevronsDown, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -25,7 +25,8 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
   position = 'fixed'
 }) => {
   const isMobile = useIsMobile();
-  const [currentOptionIndex, setCurrentOptionIndex] = useState(4); // Start with "Atual" (index 4)
+  const [currentOptionIndex, setCurrentOptionIndex] = useState(9); // Start with "Atual" (index 9)
+  const [isChanging, setIsChanging] = useState(false);
   
   const heightOptions: HeightOption[] = [
     {
@@ -36,11 +37,25 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
       description: 'Tela principal ocupa todo o espaço visível'
     },
     {
+      id: 'extra-large',
+      name: 'Extra Grande', 
+      height: '90vh',
+      icon: ChevronsUp,
+      description: 'Tela principal ocupa 9/10 da altura da tela'
+    },
+    {
       id: 'large',
       name: 'Grande',
       height: '80vh',
-      icon: MoveVertical,
+      icon: ArrowUp,
       description: 'Tela principal ocupa 4/5 da altura da tela'
+    },
+    {
+      id: 'medium-large',
+      name: 'Médio Grande',
+      height: '70vh',
+      icon: MoveVertical,
+      description: 'Tela principal ocupa 7/10 da altura da tela'
     },
     {
       id: 'above-half',
@@ -52,9 +67,30 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
     {
       id: 'half',
       name: 'Metade',
+      height: '50vh',
+      icon: Minus,
+      description: 'Tela principal ocupa metade da altura da tela'
+    },
+    {
+      id: 'small-half',
+      name: 'Abaixo da Metade',
       height: '40vh',
-      icon: Minimize2,
+      icon: ArrowDown,
       description: 'Tela principal ocupa 2/5 da altura da tela'
+    },
+    {
+      id: 'small',
+      name: 'Pequeno',
+      height: '30vh',
+      icon: ChevronsDown,
+      description: 'Tela principal ocupa 3/10 da altura da tela'
+    },
+    {
+      id: 'minimal',
+      name: 'Mínimo',
+      height: '20vh',
+      icon: Minimize2,
+      description: 'Tela principal ocupa 1/5 da altura da tela'
     },
     {
       id: 'current',
@@ -67,21 +103,34 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
 
   const currentOption = heightOptions[currentOptionIndex];
 
+  // Debounced height change function
+  const debouncedHeightChange = useCallback((height: string) => {
+    setIsChanging(true);
+    console.log(`🎛️ Height Controller: Applying height change to ${height} (${heightOptions.find(opt => opt.height === height)?.name})`);
+    onHeightChange(height);
+    
+    // Reset changing state after a short delay
+    setTimeout(() => {
+      setIsChanging(false);
+    }, 300);
+  }, [onHeightChange, heightOptions]);
+
   // Apply height change when option changes
   useEffect(() => {
-    console.log(`🎛️ Height Controller: Applying height change to ${currentOption.height} (${currentOption.name})`);
-    onHeightChange(currentOption.height);
-  }, [currentOption.height, onHeightChange]);
+    debouncedHeightChange(currentOption.height);
+  }, [currentOption.height, debouncedHeightChange]);
 
-  const handleCycleHeight = () => {
+  const handleCycleHeight = useCallback(() => {
+    if (isChanging) return; // Prevent multiple clicks while changing
+    
     const nextIndex = (currentOptionIndex + 1) % heightOptions.length;
     console.log(`🎛️ Height Controller: Changing from ${currentOption.name} to ${heightOptions[nextIndex].name} (${heightOptions[nextIndex].height})`);
     setCurrentOptionIndex(nextIndex);
-  };
+  }, [currentOptionIndex, heightOptions.length, currentOption.name, isChanging]);
 
   const IconComponent = currentOption.icon;
 
-  const baseClasses = "h-10 w-10 md:h-12 md:w-12 rounded-full shadow-lg bg-gradient-to-br from-primary/90 to-primary/70 hover:from-primary hover:to-primary/80 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110 active:scale-95";
+  const baseClasses = `h-10 w-10 md:h-12 md:w-12 rounded-full shadow-lg bg-gradient-to-br from-primary/90 to-primary/70 hover:from-primary hover:to-primary/80 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110 active:scale-95 ${isChanging ? 'animate-pulse' : ''}`;
 
   if (position === 'relative') {
     return (
@@ -91,6 +140,7 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
             <Button
               onClick={handleCycleHeight}
               size="sm"
+              disabled={isChanging}
               className={cn(baseClasses, "animate-fade-in", className)}
             >
               <IconComponent size={16} className="text-primary-foreground md:w-5 md:h-5" />
@@ -114,6 +164,7 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
           <Button
             onClick={handleCycleHeight}
             size="lg"
+            disabled={isChanging}
             className={cn(
               "fixed bottom-20 right-4 z-50",
               baseClasses,

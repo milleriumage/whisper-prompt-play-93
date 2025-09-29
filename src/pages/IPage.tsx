@@ -23,6 +23,7 @@ import { BottomNavigation } from '@/components/BottomNavigation';
 import { useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { ControladorDeAlturaTelaPrincipal } from '@/components/ControladorDeAlturaTelaPrincipal';
+import { useHeightController } from '@/hooks/useHeightController';
 // Usando imagem placeholder temporária
 const profileImage = '/lovable-uploads/4bb15841-814d-4462-aa20-1488516e0562.png';
 
@@ -78,7 +79,8 @@ export default function IPage() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showStripeKeyDialog, setShowStripeKeyDialog] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(true);
-  const [mainScreenHeight, setMainScreenHeight] = useState('auto'); // Height controller state
+  // Height controller hook
+  const { mainScreenHeight, isChanging: heightChanging, handleHeightChange } = useHeightController('auto');
   const { language, setLanguage, t } = useLanguage();
   const defaultUserId = '171c4bb2-9fdd-4c5e-a340-c3f2c8c89e07';
   const {
@@ -339,14 +341,17 @@ export default function IPage() {
       </div>;
   }
   return <div 
-    className={`overflow-x-hidden w-full ${
+    className={`w-full height-controller-container ${
+      mainScreenHeight === 'auto' ? 'auto-height' : 'fixed-height'
+    } ${heightChanging ? 'opacity-90' : ''} ${
       isDarkTheme 
         ? 'bg-gradient-to-br from-blue-600 via-purple-600 to-purple-800' 
         : 'bg-gradient-to-br from-red-50 via-white to-red-50'
-    }`}
+    } ${mainScreenHeight === 'auto' ? 'overflow-x-hidden' : 'flex items-center justify-center overflow-hidden'}`}
     style={{
       height: mainScreenHeight === 'auto' ? 'auto' : mainScreenHeight,
-      minHeight: mainScreenHeight === 'auto' ? '100vh' : mainScreenHeight
+      minHeight: mainScreenHeight === 'auto' ? '100vh' : mainScreenHeight,
+      width: mainScreenHeight === 'auto' ? '100%' : '100vw'
     }}
   >
       {/* Language Selector and Theme Toggle */}
@@ -1007,7 +1012,7 @@ export default function IPage() {
       
       {/* Height Controller for Main Screen */}
       <ControladorDeAlturaTelaPrincipal 
-        onHeightChange={setMainScreenHeight}
+        onHeightChange={handleHeightChange}
       />
       
       {/* Bottom Navigation */}

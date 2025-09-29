@@ -22,6 +22,38 @@
     min-width: 44px;
   }
 
+  /* Height controller responsive utilities */
+  .height-controller-container {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .height-controller-container.auto-height {
+    position: relative;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+  
+  .height-controller-container.fixed-height {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    overflow: hidden;
+  }
+  
+  @media (max-width: 768px) {
+    .height-controller-container.fixed-height {
+      width: 100vw;
+      height: 100vh !important;
+      height: 100dvh !important;
+      top: 0;
+      left: 0;
+      transform: none;
+    }
+  }
+
   /* Mobile drag utilities */
   .mobile-draggable {
     touch-action: none;

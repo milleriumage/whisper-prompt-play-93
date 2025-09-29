@@ -1036,7 +1036,7 @@ export const MediaShowcase = React.memo(({
            </div>
           
            {/* Fixed Upload Buttons - Right side */}
-          <div className="flex items-center gap-2">
+           <div className="flex flex-col items-end gap-2 fixed right-4 top-1/2 transform -translate-y-1/2 z-40">
             {/* Upload buttons - only show if upload props are provided AND showUploadButtons is true AND user is creator */}
              {visibilitySettings?.showUploadButtons && onUploadImage && canEdit && <Button onClick={handleImageUpload} size="sm" variant="ghost" className="h-10 w-10 p-0 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 hover:from-primary/30 hover:to-accent/30 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110 shadow-lg hover:shadow-xl" title={t('mediaShowcase.uploadPhoto')}>
                  <Upload className="w-4 h-4 text-primary" />

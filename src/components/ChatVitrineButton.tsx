@@ -3,8 +3,9 @@ import { Monitor, Upload, Mic, Send, Edit, Plus, X, DoorOpen, Heart, Crown, Move
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+
 import { Switch } from '@/components/ui/switch';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from "sonner";
 import { useChatControls } from "@/hooks/useChatControls";
@@ -54,6 +55,7 @@ export const ChatVitrineButton: React.FC<ChatVitrineButtonProps> = ({
   visibilitySettings
 }) => {
   const [showChatOverlay, setShowChatOverlay] = useState(false);
+  const [chatPosition, setChatPosition] = useState({ x: 0, y: 0 });
   const [currentMessage, setCurrentMessage] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [expandedImage, setExpandedImage] = useState<string>("");
@@ -141,13 +143,23 @@ export const ChatVitrineButton: React.FC<ChatVitrineButtonProps> = ({
   const isVisitor = !user || (creatorId && user.id !== creatorId);
   const isCreator = user && creatorId && user.id === creatorId;
 
-  const handleToggle = () => {
+  const handleToggle = (event: React.MouseEvent) => {
     const newState = !showChatOverlay;
+    
+    if (newState) {
+      // Capturar a posição do clique
+      const rect = event.currentTarget.getBoundingClientRect();
+      const x = rect.left - 320; // Ajustar para que o chat apareça à esquerda do botão
+      const y = rect.top;
+      
+      setChatPosition({ x: Math.max(0, x), y: Math.max(0, y) });
+    }
+    
     console.log(`[CHAT VITRINE DEBUG] Alterando estado: ${showChatOverlay} -> ${newState}`);
     setShowChatOverlay(newState);
     onToggle?.(newState);
 
-    toast.success(newState ? "📺 Chat Vitrine ativado - Chat sobrepõe a vitrine" : "📺 Chat Vitrine desativado - Vitrine restaurada");
+    toast.success(newState ? "📺 Chat Vitrine ativado - Chat fixo na posição" : "📺 Chat Vitrine desativado");
   };
 
   const handleSendMessage = async () => {
@@ -357,9 +369,17 @@ export const ChatVitrineButton: React.FC<ChatVitrineButtonProps> = ({
         </Tooltip>
       </TooltipProvider>
 
-      {/* Enhanced Chat Overlay - Covers the showcase/vitrine with all advanced features */}
+      {/* Enhanced Chat Overlay - Fixed at clicked position */}
       {showChatOverlay && (
-        <div ref={windowRef} style={windowStyle}>
+        <div 
+          className="fixed z-50"
+          style={{
+            left: `${chatPosition.x}px`,
+            top: `${chatPosition.y}px`,
+            width: '320px',
+            height: '400px'
+          }}
+        >
           <div className={`flex flex-col overflow-hidden shadow-xl relative ${config.fleffyMode ? 'bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 border-2 border-pink-200 rounded-3xl shadow-pink-100/50 shadow-2xl' : config.glassMorphism ? 'bg-white/10 backdrop-blur-xl border border-white/30 rounded-2xl shadow-lg' : isMinimalTheme ? 'bg-white border border-gray-200 rounded-xl' : 'bg-card/95 backdrop-blur-md border border-border/50 rounded-2xl'} ${isDragging ? 'shadow-2xl scale-105' : ''} transition-all duration-200`} 
             style={{ height: '100%', backgroundColor: config.chatBackgroundColor !== "transparent" ? config.chatBackgroundColor : undefined }}>
             

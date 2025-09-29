@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Monitor, Maximize2, Minimize2, MoveVertical, RotateCcw, ArrowUp, ArrowDown, ChevronsUp, ChevronsDown, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { usePerformanceOptimization } from '@/hooks/usePerformanceOptimization';
 
 export type HeightOption = {
   id: string;
@@ -25,8 +26,10 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
   position = 'fixed'
 }) => {
   const isMobile = useIsMobile();
+  const { throttle } = usePerformanceOptimization();
   const [currentOptionIndex, setCurrentOptionIndex] = useState(9); // Start with "Atual" (index 9)
-  const [isChanging, setIsChanging] = useState(false);
+  const lastClickTime = useRef(0);
+  const isProcessing = useRef(false);
   
   const heightOptions: HeightOption[] = [
     {
@@ -103,34 +106,38 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
 
   const currentOption = heightOptions[currentOptionIndex];
 
-  // Debounced height change function
-  const debouncedHeightChange = useCallback((height: string) => {
-    setIsChanging(true);
-    console.log(`🎛️ Height Controller: Applying height change to ${height} (${heightOptions.find(opt => opt.height === height)?.name})`);
-    onHeightChange(height);
-    
-    // Reset changing state after a short delay
-    setTimeout(() => {
-      setIsChanging(false);
-    }, 300);
-  }, [onHeightChange, heightOptions]);
-
-  // Apply height change when option changes
-  useEffect(() => {
-    debouncedHeightChange(currentOption.height);
-  }, [currentOption.height, debouncedHeightChange]);
+  // Optimized height change with smooth throttling
+  const optimizedHeightChange = useCallback(
+    throttle((height: string) => {
+      console.log(`🎛️ Height Controller: Applying height change to ${height} (${heightOptions.find(opt => opt.height === height)?.name})`);
+      onHeightChange(height);
+      isProcessing.current = false;
+    }, 150),
+    [onHeightChange, throttle]
+  );
 
   const handleCycleHeight = useCallback(() => {
-    if (isChanging) return; // Prevent multiple clicks while changing
+    const now = Date.now();
+    
+    // Prevent rapid clicks
+    if (now - lastClickTime.current < 200 || isProcessing.current) return;
+    
+    lastClickTime.current = now;
+    isProcessing.current = true;
     
     const nextIndex = (currentOptionIndex + 1) % heightOptions.length;
-    console.log(`🎛️ Height Controller: Changing from ${currentOption.name} to ${heightOptions[nextIndex].name} (${heightOptions[nextIndex].height})`);
+    const nextOption = heightOptions[nextIndex];
+    
+    console.log(`🎛️ Height Controller: Changing from ${currentOption.name} to ${nextOption.name} (${nextOption.height})`);
+    
     setCurrentOptionIndex(nextIndex);
-  }, [currentOptionIndex, heightOptions.length, currentOption.name, isChanging]);
+    optimizedHeightChange(nextOption.height);
+  }, [currentOptionIndex, heightOptions, currentOption.name, optimizedHeightChange]);
 
   const IconComponent = currentOption.icon;
 
-  const baseClasses = `h-10 w-10 md:h-12 md:w-12 rounded-full shadow-lg bg-gradient-to-br from-primary/90 to-primary/70 hover:from-primary hover:to-primary/80 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:scale-110 active:scale-95 ${isChanging ? 'animate-pulse' : ''}`;
+  const isCurrentlyProcessing = isProcessing.current;
+  const baseClasses = `h-10 w-10 md:h-12 md:w-12 rounded-full shadow-lg bg-gradient-to-br from-primary/90 to-primary/70 hover:from-primary hover:to-primary/80 backdrop-blur-sm border border-white/20 transition-all duration-200 hover:scale-105 active:scale-95 ${isCurrentlyProcessing ? 'opacity-70' : 'opacity-100'}`;
 
   if (position === 'relative') {
     return (
@@ -140,7 +147,7 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
             <Button
               onClick={handleCycleHeight}
               size="sm"
-              disabled={isChanging}
+              disabled={false}
               className={cn(baseClasses, "animate-fade-in", className)}
             >
               <IconComponent size={16} className="text-primary-foreground md:w-5 md:h-5" />
@@ -164,7 +171,7 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
           <Button
             onClick={handleCycleHeight}
             size="lg"
-            disabled={isChanging}
+            disabled={false}
             className={cn(
               "fixed bottom-20 right-4 z-50",
               baseClasses,

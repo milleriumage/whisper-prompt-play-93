@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { toast } from 'sonner';
+import { toast } from "@/utils/notificationUtils";
 import { Card } from '@/components/ui/card';
 import { useChatControls } from "@/hooks/useChatControls";
 import { UserLinkDisplay } from "@/components/UserLinkDisplay";

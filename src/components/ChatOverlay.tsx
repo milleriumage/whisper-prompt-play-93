@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Upload, Mic, Send, Edit, Plus, X, DoorOpen, Heart, Crown, Move, RotateCcw, Minimize2, Maximize2, Gift } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/utils/notificationUtils";
 import { useChatControls } from "@/hooks/useChatControls";
 import { UserLinkDisplay } from "@/components/UserLinkDisplay";
 import { useChatConfiguration } from "@/hooks/useChatConfiguration";

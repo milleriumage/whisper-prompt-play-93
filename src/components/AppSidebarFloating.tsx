@@ -37,7 +37,7 @@ import { SalesHistoryModal } from '@/components/SalesHistoryModal';
 import { PasswordDialog } from '@/components/PasswordDialog';
 import { MediaTimerDialog } from '@/components/MediaTimerDialog';
 import { useLanguage } from '@/hooks/useLanguage';
-import { toast } from 'sonner';
+import { toast } from '@/utils/notificationUtils';
 import { Button } from '@/components/ui/button';
 
 interface NavItem {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from "@/utils/notificationUtils";
 import { ChatOverlay } from './ChatOverlay';
 interface ChatOverlayButtonProps {
   onToggle?: (isOpen: boolean) => void;
@@ -32,6 +32,8 @@ export const ChatOverlayButton: React.FC<ChatOverlayButtonProps> = ({
   visibilitySettings
 }) => {
   const [showChatOverlay, setShowChatOverlay] = useState(false);
+  const { toast } = useToast();
+  
   const handleToggle = () => {
     const newState = !showChatOverlay;
     console.log(`[CHAT OVERLAY DEBUG] Alterando estado: ${showChatOverlay} -> ${newState}`);

@@ -49,6 +49,7 @@ import { CreditSuccessNotification } from "@/components/CreditSuccessNotificatio
 import { CreditDeductionNotification } from "@/components/CreditDeductionNotification";
 import { ForcedLoginDialog } from "@/components/ForcedLoginDialog";
 import { ControladorDeAlturaTelaPrincipal } from "@/components/ControladorDeAlturaTelaPrincipal";
+import { ResponsiveMainContent } from "@/components/ResponsiveMainContent";
 import { TemplateUserTest } from "@/components/TemplateUserTest";
 import { SlideshowDisplay } from "@/components/SlideshowDisplay";
 import { ViewportToggle } from "@/components/ViewportToggle";
@@ -1289,11 +1290,7 @@ const Index = () => {
         </div>
 
         {visibilitySettings.showMainMediaDisplay && <>
-            <div className="relative w-screen fixed inset-0 flex items-center justify-center overflow-hidden" 
-              style={{
-                height: mainScreenHeight === 'auto' ? '100vh' : mainScreenHeight,
-                transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)' // Smoother transition
-              }}>
+            <ResponsiveMainContent height={mainScreenHeight}>
               {/* Timer principal no canto superior quando ativo */}
               {isTimerRunning && timer > 0 && <div className={`absolute top-4 left-4 z-30 rounded-lg px-4 py-2 border shadow-lg ${timerTransparentBg ? 'bg-transparent border-white/40' : 'bg-black/80 backdrop-blur-sm border-white/20'}`}>
                   <div className={`flex items-center gap-2 text-white font-bold text-lg ${timer <= 30 ? 'animate-pulse text-red-400' : isTimerBlinking ? 'animate-[pulse_1s_ease-in-out_infinite] text-white' : 'text-white'}`}>
@@ -1394,7 +1391,6 @@ const Index = () => {
           }}>
                 <ZoomIn className="w-5 h-5 text-foreground" />
               </Button>
-            </div>
 
             <MediaShowcase mediaItems={mediaItems} onUploadImage={file => {
           if (hasPassword && isLocked) {
@@ -1452,8 +1448,8 @@ const Index = () => {
             setShowLinkDialog(true);
           });
         }} passwordProtected={hasPassword && isLocked} onPasswordVerify={handlePasswordVerification} credits={credits} onAddCredits={addCredits} onSubtractCredits={subtractCredits} onSlideshowConfigChange={setSlideshowConfig} visibilitySettings={visibilitySettings} creatorId={user?.id} onTogglePurchasedContent={setPurchasedContentMinimized} />
+            </ResponsiveMainContent>
           </>}
-
 
 
         {/* Slideshow Display - apenas se não estiver minimizado */}

@@ -25,7 +25,7 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
   position = 'fixed'
 }) => {
   const isMobile = useIsMobile();
-  const [currentOptionIndex, setCurrentOptionIndex] = useState(4); // Start with "Atual" (index 4)
+  const [currentOptionIndex, setCurrentOptionIndex] = useState(0); // Start with "Tela Cheia" (index 0)
   
   const heightOptions: HeightOption[] = [
     {
@@ -33,35 +33,35 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
       name: 'Tela Cheia',
       height: '100vh',
       icon: Maximize2,
-      description: 'Tela principal ocupa todo o espaço visível'
+      description: 'Tela principal ocupa todo o espaço visível sem espaços vazios'
     },
     {
       id: 'large',
       name: 'Grande',
-      height: '80vh',
+      height: 'calc(100vh - 8rem)',
       icon: MoveVertical,
-      description: 'Tela principal ocupa 4/5 da altura da tela'
+      description: 'Tela otimizada com espaço para controles (80% da tela)'
     },
     {
-      id: 'above-half',
-      name: 'Acima da Metade',
-      height: '60vh',
+      id: 'medium',
+      name: 'Média',
+      height: 'calc(100vh - 12rem)',
       icon: Monitor,
-      description: 'Tela principal ocupa 3/5 da altura da tela'
+      description: 'Visualização balanceada com espaço adequado para ferramentas'
     },
     {
-      id: 'half',
-      name: 'Metade',
-      height: '40vh',
+      id: 'compact',
+      name: 'Compacta',
+      height: 'calc(100vh - 16rem)',
       icon: Minimize2,
-      description: 'Tela principal ocupa 2/5 da altura da tela'
+      description: 'Modo compacto com máximo espaço para interface'
     },
     {
-      id: 'current',
-      name: 'Atual',
-      height: 'auto',
+      id: 'auto-fit',
+      name: 'Ajuste Auto',
+      height: 'fit-content',
       icon: RotateCcw,
-      description: 'Retorna ao estado original da interface'
+      description: 'Altura se adapta automaticamente ao conteúdo'
     }
   ];
 

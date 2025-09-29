@@ -425,7 +425,7 @@ export const EnhancedChat = ({
   if (isMinimized) {
     return (
       <>
-        {/* Mensagens flutuantes sobrepostas */}
+        {/* Mensagens flutuantes sobrepostas - responsivas */}
         <div className="fixed inset-0 pointer-events-none z-40">
           {floatingMessages.map((msg, index) => (
             <div
@@ -433,50 +433,63 @@ export const EnhancedChat = ({
               className="absolute animate-fade-in pointer-events-none"
               style={{
                 top: `${20 + index * 80}px`,
-                right: '20px',
+                right: isMobile ? '16px' : '20px',
+                left: isMobile ? '16px' : 'auto',
                 animation: 'fade-in 0.3s ease-out'
               }}
             >
-              <div className="bg-primary/90 text-primary-foreground px-4 py-2 rounded-full shadow-lg backdrop-blur-sm max-w-xs">
+              <div className={`bg-primary/90 text-primary-foreground px-4 py-2 rounded-full shadow-lg backdrop-blur-sm ${
+                isMobile ? 'max-w-[calc(100vw-32px)]' : 'max-w-xs'
+              }`}>
                 <span className="text-xs font-medium">{msg.username}</span>
-                <p className="text-sm">{msg.message}</p>
+                <p className="text-sm truncate">{msg.message}</p>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Input minimizado igual para todas as telas */}
-        <div className="fixed z-50 bg-background/95 backdrop-blur-sm border p-4 rounded-2xl shadow-lg bottom-4 right-4 w-80 border rounded-2xl">
-          <div className="flex gap-2 items-center">
-            <Button 
-              size="sm" 
-              variant="outline" 
-              onClick={() => setIsMinimized(false)}
-              className="h-10 w-10 rounded-full"
-            >
-              <Maximize2 className="w-4 h-4" />
-            </Button>
-            <div className="flex-1 relative">
-              <Input 
-                value={currentMessage} 
-                onChange={e => setCurrentMessage(e.target.value)} 
-                onKeyPress={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleSendMessage();
-                  }
-                }} 
-                placeholder="Digite uma mensagem..." 
-                className="pr-12 rounded-full"
-              />
+        {/* Input minimizado responsivo para todas as telas */}
+        <div className={`fixed z-50 bg-background/95 backdrop-blur-sm border rounded-2xl shadow-lg transition-all duration-300 ${
+          isMobile 
+            ? 'bottom-4 left-4 right-4 max-w-none' // Mobile: full width with margins
+            : 'bottom-4 right-4 w-80' // Desktop: fixed width
+        }`}>
+          <div className="p-3">
+            <div className="flex gap-2 items-center">
               <Button 
-                onClick={handleSendMessage} 
                 size="sm" 
-                disabled={!currentMessage.trim()} 
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full"
+                variant="outline" 
+                onClick={() => {
+                  console.log('💬 Chat: Maximizing chat...');
+                  setIsMinimized(false);
+                  toast.success('💬 Chat expandido');
+                }}
+                className="h-10 w-10 rounded-full shrink-0"
               >
-                <Send className="w-4 h-4" />
+                <Maximize2 className="w-4 h-4" />
               </Button>
+              <div className="flex-1 relative">
+                <Input 
+                  value={currentMessage} 
+                  onChange={e => setCurrentMessage(e.target.value)} 
+                  onKeyPress={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }} 
+                  placeholder="Digite uma mensagem..." 
+                  className="pr-12 rounded-full"
+                />
+                <Button 
+                  onClick={handleSendMessage} 
+                  size="sm" 
+                  disabled={!currentMessage.trim()} 
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -576,7 +589,11 @@ export const EnhancedChat = ({
             <Button 
               size="sm" 
               variant="ghost" 
-              onClick={() => setIsMinimized(true)}
+              onClick={() => {
+                console.log('💬 Chat: Minimizing chat...');
+                setIsMinimized(true);
+                toast.success('💬 Chat minimizado');
+              }}
               className="h-8 w-8 rounded-full hover:bg-muted transition-colors"
               title="Minimizar chat"
             >

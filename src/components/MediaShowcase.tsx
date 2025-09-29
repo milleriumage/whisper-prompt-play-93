@@ -1,6 +1,5 @@
 // Controle de notificações - altere para true para reativar  
 const NOTIFICATIONS_ENABLED = false;
-
 import React, { useRef, useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -991,9 +990,7 @@ export const MediaShowcase = React.memo(({
           {/* Center - Follow & Subscribe Buttons - para todos */}
           <div className="flex-1 flex items-center justify-center gap-3">
             <FollowButton isFollowing={isFollowing} onToggleFollow={toggleFollow} isLoading={false} />
-            <Button onClick={() => setShowPremiumDialog(true)} size="sm" variant="default" className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium">
-              Assinar ConteÃºdo
-            </Button>
+            
           </div>
           <div className="flex items-center gap-3">
             {canEdit && <DropdownMenu>
@@ -1082,54 +1079,34 @@ export const MediaShowcase = React.memo(({
         {!isMinimized && sortedMediaItems.length > 0 && <ScrollArea className="w-full whitespace-nowrap">
             <div className="flex space-x-3 sm:space-x-4 pb-4">
                {sortedMediaItems.map(item => {
-             const timer = getTimer(item.id);
-             return <div key={item.id} className={`relative flex-shrink-0 w-32 sm:w-40 md:w-48 lg:w-56 group ${item.id === sortedMediaItems[0]?.id ? 'sticky left-0 z-10 bg-background/80 backdrop-blur-sm' : ''}`}>
+            const timer = getTimer(item.id);
+            return <div key={item.id} className={`relative flex-shrink-0 w-32 sm:w-40 md:w-48 lg:w-56 group ${item.id === sortedMediaItems[0]?.id ? 'sticky left-0 z-10 bg-background/80 backdrop-blur-sm' : ''}`}>
                     <div className={`relative ${isUnlocked && passwordProtected ? 'ring-2 ring-blue-400 ring-opacity-50' : ''}`}>
-                      {item.type === 'image' ? 
-                        <img 
-                          src={getMediaUrl(item.storage_path)} 
-                          alt={item.name || "Media"} 
-                          className={`w-full h-28 sm:h-32 md:h-36 lg:h-40 object-cover rounded-lg cursor-pointer transition-all duration-300 ${item.is_blurred && (!item.hover_unblur || !hoveredItems.has(item.id)) ? 'blur-md' : ''}`} 
-                          title={item.description || ""} 
-                          onClick={() => handleMediaClick(item)} 
-                          onMouseEnter={() => {
-                            if (item.hover_unblur && item.is_blurred) {
-                              setHoveredItems(prev => new Set(prev).add(item.id));
-                            }
-                          }} 
-                          onMouseLeave={() => {
-                            if (item.hover_unblur && item.is_blurred) {
-                              setHoveredItems(prev => {
-                                const newSet = new Set(prev);
-                                newSet.delete(item.id);
-                                return newSet;
-                              });
-                            }
-                          }} 
-                        /> : 
-                        <VideoThumbnail
-                          src={item.storage_path}
-                          alt={item.name || "Video"}
-                          className="w-full h-28 sm:h-32 md:h-36 lg:h-40 rounded-lg"
-                          title={item.description || ""}
-                          onClick={() => handleMediaClick(item)}
-                          onMouseEnter={() => {
-                            if (item.hover_unblur && item.is_blurred) {
-                              setHoveredItems(prev => new Set(prev).add(item.id));
-                            }
-                          }}
-                          onMouseLeave={() => {
-                            if (item.hover_unblur && item.is_blurred) {
-                              setHoveredItems(prev => {
-                                const newSet = new Set(prev);
-                                newSet.delete(item.id);
-                                return newSet;
-                              });
-                            }
-                          }}
-                          isBlurred={item.is_blurred && (!item.hover_unblur || !hoveredItems.has(item.id))}
-                        />
-                      }
+                      {item.type === 'image' ? <img src={getMediaUrl(item.storage_path)} alt={item.name || "Media"} className={`w-full h-28 sm:h-32 md:h-36 lg:h-40 object-cover rounded-lg cursor-pointer transition-all duration-300 ${item.is_blurred && (!item.hover_unblur || !hoveredItems.has(item.id)) ? 'blur-md' : ''}`} title={item.description || ""} onClick={() => handleMediaClick(item)} onMouseEnter={() => {
+                  if (item.hover_unblur && item.is_blurred) {
+                    setHoveredItems(prev => new Set(prev).add(item.id));
+                  }
+                }} onMouseLeave={() => {
+                  if (item.hover_unblur && item.is_blurred) {
+                    setHoveredItems(prev => {
+                      const newSet = new Set(prev);
+                      newSet.delete(item.id);
+                      return newSet;
+                    });
+                  }
+                }} /> : <VideoThumbnail src={item.storage_path} alt={item.name || "Video"} className="w-full h-28 sm:h-32 md:h-36 lg:h-40 rounded-lg" title={item.description || ""} onClick={() => handleMediaClick(item)} onMouseEnter={() => {
+                  if (item.hover_unblur && item.is_blurred) {
+                    setHoveredItems(prev => new Set(prev).add(item.id));
+                  }
+                }} onMouseLeave={() => {
+                  if (item.hover_unblur && item.is_blurred) {
+                    setHoveredItems(prev => {
+                      const newSet = new Set(prev);
+                      newSet.delete(item.id);
+                      return newSet;
+                    });
+                  }
+                }} isBlurred={item.is_blurred && (!item.hover_unblur || !hoveredItems.has(item.id))} />}
                         
                         {/* Like button - Top left */}
                         <div className="absolute top-2 left-2 z-10">
@@ -1285,29 +1262,23 @@ export const MediaShowcase = React.memo(({
                   try {
                     const priceConfig = typeof item.price === 'string' && item.price.startsWith('{') ? JSON.parse(item.price) : null;
                     if (priceConfig?.enableCreditPurchase) {
-                      return <CreditPurchaseButton 
-                        mediaId={item.id} 
-                        creatorId={creatorId} 
-                        mediaTitle={item.name || "este conteúdo"} 
-                        priceConfig={priceConfig}
-                        isUnlocked={!item.is_locked && !item.is_blurred}
-                        onPurchaseSuccess={() => {
-                          // Desbloquear mídia e remover blur
-                          onUpdateMedia(item.id, {
-                            is_locked: false,
-                            is_blurred: false
-                          });
+                      return <CreditPurchaseButton mediaId={item.id} creatorId={creatorId} mediaTitle={item.name || "este conteúdo"} priceConfig={priceConfig} isUnlocked={!item.is_locked && !item.is_blurred} onPurchaseSuccess={() => {
+                        // Desbloquear mídia e remover blur
+                        onUpdateMedia(item.id, {
+                          is_locked: false,
+                          is_blurred: false
+                        });
 
-                          // Cancelar timer de auto-delete temporariamente
-                          cancelAutoDeleteTimer(item.id);
+                        // Cancelar timer de auto-delete temporariamente
+                        cancelAutoDeleteTimer(item.id);
 
-                          // Usar evento customizado ao invés de reload
-                          window.dispatchEvent(new CustomEvent('media-purchase-success', {
-                            detail: {
-                              mediaId: item.id
-                            }
-                          }));
-                        }} />;
+                        // Usar evento customizado ao invés de reload
+                        window.dispatchEvent(new CustomEvent('media-purchase-success', {
+                          detail: {
+                            mediaId: item.id
+                          }
+                        }));
+                      }} />;
                     }
                   } catch (e) {
                     console.error('Error parsing price config for credit purchase:', e);
@@ -1645,39 +1616,21 @@ export const MediaShowcase = React.memo(({
       {/* Chat Buttons - Separate controls */}
       <div className="fixed right-4 top-20 z-40 flex flex-col gap-2">
         {/* Chat Vitrine Button - Opens overlay that covers showcase */}
-        <ChatVitrineButton 
-          onToggle={isOpen => setShowChatOverlay(isOpen)}
-          creatorId={creatorId}
-          passwordProtected={!!passwordProtected}
-          onPasswordVerify={(callback) => onPasswordVerify("chat", callback)}
-          credits={credits}
-          isLoggedIn={isLoggedIn}
-          visibilitySettings={{
-            showChatEditing: true,
-            showChatCloseIcon: true
-          }}
-        />
+        <ChatVitrineButton onToggle={isOpen => setShowChatOverlay(isOpen)} creatorId={creatorId} passwordProtected={!!passwordProtected} onPasswordVerify={callback => onPasswordVerify("chat", callback)} credits={credits} isLoggedIn={isLoggedIn} visibilitySettings={{
+        showChatEditing: true,
+        showChatCloseIcon: true
+      }} />
         
         {/* Chat Pop-up Button - Opens floating window */}
-        <ChatPopupButton 
-          creatorId={creatorId}
-          passwordProtected={!!passwordProtected}
-          onPasswordVerify={(callback) => onPasswordVerify("chat", callback)}
-          credits={credits}
-          isLoggedIn={isLoggedIn}
-          visibilitySettings={{
-            showChatEditing: true,
-            showChatCloseIcon: true
-          }}
-          messages={messages}
-          onSendMessage={onSendMessage}
-          onEditMessage={(message: any) => {
-            toast({
-              title: "🔒 Apenas criadores podem editar mensagens!",
-              variant: "destructive"
-            });
-          }}
-        />
+        <ChatPopupButton creatorId={creatorId} passwordProtected={!!passwordProtected} onPasswordVerify={callback => onPasswordVerify("chat", callback)} credits={credits} isLoggedIn={isLoggedIn} visibilitySettings={{
+        showChatEditing: true,
+        showChatCloseIcon: true
+      }} messages={messages} onSendMessage={onSendMessage} onEditMessage={(message: any) => {
+        toast({
+          title: "🔒 Apenas criadores podem editar mensagens!",
+          variant: "destructive"
+        });
+      }} />
       </div>
     </div>;
 });

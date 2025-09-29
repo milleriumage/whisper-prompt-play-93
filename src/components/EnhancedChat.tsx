@@ -445,12 +445,8 @@ export const EnhancedChat = ({
           ))}
         </div>
 
-        {/* Input minimizado adaptável para todas as telas */}
-        <div className={`fixed z-50 bg-background/95 backdrop-blur-sm border p-4 rounded-2xl shadow-lg ${
-          isMobile 
-            ? 'bottom-0 left-0 right-0 border-t rounded-t-2xl rounded-b-none' 
-            : 'bottom-4 right-4 w-80 border rounded-2xl'
-        }`}>
+        {/* Input minimizado igual para todas as telas */}
+        <div className="fixed z-50 bg-background/95 backdrop-blur-sm border p-4 rounded-2xl shadow-lg bottom-4 right-4 w-80 border rounded-2xl">
           <div className="flex gap-2 items-center">
             <Button 
               size="sm" 

@@ -44,23 +44,23 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
     {
       id: 'extra-large',
       name: 'Extra Grande', 
-      height: '90vh',
+      height: '95vh',
       icon: ChevronsUp,
-      description: 'Tela principal ocupa 9/10 da altura da tela'
+      description: 'Tela principal ocupa quase toda altura da tela'
     },
     {
       id: 'large',
       name: 'Grande',
-      height: '80vh',
+      height: '87vh',
       icon: ArrowUp,
-      description: 'Tela principal ocupa 4/5 da altura da tela'
+      description: 'Tela principal ocupa maior parte da altura da tela'
     },
     {
       id: 'medium-large',
       name: 'Médio Grande',
-      height: '70vh',
+      height: '78vh',
       icon: MoveVertical,
-      description: 'Tela principal ocupa 7/10 da altura da tela'
+      description: 'Tela principal ocupa 3/4 da altura da tela'
     },
     {
       id: 'above-half',

@@ -36,36 +36,44 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
   // Function to calculate responsive height based on viewport constraints
   const calculateResponsiveHeight = useCallback((percentage: number) => {
     try {
-      // Find reference elements
-      const followersElement = document.querySelector('[class*="followers"]') || 
-                              document.querySelector('[class*="seguidores"]') ||
-                              document.querySelector('button[class*="bg-secondary"]');
+      // More robust element detection
+      const creditsSection = document.querySelector('.flex.flex-col.sm\\:flex-row.sm\\:justify-between') ||
+                            document.querySelector('[class*="creditsVisible"]') ||
+                            document.querySelector('button[class*="bg-secondary"]');
       
-      const premiumElement = document.querySelector('[class*="premium"]') || 
-                            document.querySelector('button[class*="BE PREMIUM"]') ||
-                            document.querySelector('button[class*="bg-accent"]');
+      const chatSection = document.querySelector('[class*="showChat"]') ||
+                         document.querySelector('.relative .p-4.bg-card.border') ||
+                         document.querySelector('[class*="EnhancedChat"]');
 
-      if (followersElement && premiumElement) {
-        const followersRect = followersElement.getBoundingClientRect();
-        const premiumRect = premiumElement.getBoundingClientRect();
-        
-        // Calculate available space between elements
-        const topOffset = Math.max(followersRect.bottom + 16, 120); // 16px margin + min 120px from top
-        const bottomOffset = Math.max(window.innerHeight - premiumRect.top + 16, 80); // 16px margin + min 80px from bottom
-        const availableHeight = window.innerHeight - topOffset - bottomOffset;
-        
-        // Apply percentage to available space
-        const calculatedHeight = Math.max(availableHeight * (percentage / 100), 200); // Min 200px
-        
-        console.log(`📐 Responsive Height: ${percentage}% = ${calculatedHeight}px (available: ${availableHeight}px)`);
-        return `${calculatedHeight}px`;
+      let topOffset = 120; // Default top margin
+      let bottomOffset = 80; // Default bottom margin
+
+      if (creditsSection) {
+        const rect = creditsSection.getBoundingClientRect();
+        topOffset = Math.max(rect.bottom + 16, 120);
+      }
+
+      if (chatSection) {
+        const rect = chatSection.getBoundingClientRect();
+        bottomOffset = Math.max(window.innerHeight - rect.top + 16, 80);
+      }
+
+      const availableHeight = window.innerHeight - topOffset - bottomOffset;
+      
+      // If calculation seems wrong, use safer viewport-based approach
+      if (availableHeight < 200) {
+        const fallbackHeight = Math.max((window.innerHeight * percentage) / 100, 250);
+        console.log(`📐 Fallback Height: ${percentage}% = ${fallbackHeight}px (viewport-based)`);
+        return `${fallbackHeight}px`;
       }
       
-      // Fallback to viewport percentage if elements not found
-      return `${percentage}vh`;
+      const calculatedHeight = Math.max((availableHeight * percentage) / 100, 250);
+      console.log(`📐 Responsive Height: ${percentage}% = ${calculatedHeight}px (available: ${availableHeight}px)`);
+      return `${calculatedHeight}px`;
     } catch (error) {
-      console.warn('Error calculating responsive height:', error);
-      return `${percentage}vh`;
+      console.warn('Error calculating responsive height, using viewport fallback:', error);
+      const fallbackHeight = Math.max((window.innerHeight * percentage) / 100, 250);
+      return `${fallbackHeight}px`;
     }
   }, []);
   
@@ -144,12 +152,12 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
 
   const currentOption = heightOptions[currentOptionIndex];
 
-  // Optimized height change with smooth throttling and responsive calculation
+  // Optimized height change with immediate response and minimal throttling
   const optimizedHeightChange = useCallback(
     throttle((height: string, optionName: string) => {
       let finalHeight = height;
       
-      // Process responsive heights
+      // Process responsive heights with immediate calculation
       if (height.startsWith('responsive-')) {
         const percentage = parseInt(height.replace('responsive-', ''));
         finalHeight = calculateResponsiveHeight(percentage);
@@ -158,21 +166,23 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
       console.log(`🎛️ Height Controller: Applying height change to ${finalHeight} (${optionName})`);
       onHeightChange(finalHeight);
       isProcessing.current = false;
-    }, 100),
+    }, 50), // Reduced throttle time for faster response
     [onHeightChange, throttle, calculateResponsiveHeight]
   );
 
   const handleHeightSelect = useCallback((option: HeightOption, index: number) => {
     const now = Date.now();
     
-    // Prevent rapid clicks
-    if (now - lastClickTime.current < 150 || isProcessing.current) return;
+    // Reduced delay for faster response
+    if (now - lastClickTime.current < 100 || isProcessing.current) return;
     
     lastClickTime.current = now;
     isProcessing.current = true;
     
     setCurrentOptionIndex(index);
     setIsOpen(false);
+    
+    // Execute immediately without additional delay
     optimizedHeightChange(option.height, option.name);
     
     if (option.name === 'Atual') {

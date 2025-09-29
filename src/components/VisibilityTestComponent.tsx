@@ -17,8 +17,13 @@ export const VisibilityTestComponent = () => {
     settings: visibilitySettings,
     isLoading
   } = useVisibilitySettings();
-  const { isPagePublic, togglePageVisibility } = usePageVisibility();
-  const { wishlistItems } = useWishlist();
+  const {
+    isPagePublic,
+    togglePageVisibility
+  } = usePageVisibility();
+  const {
+    wishlistItems
+  } = useWishlist();
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [showVisitorSettingsDialog, setShowVisitorSettingsDialog] = useState(false);
   const [showGiftGallery, setShowGiftGallery] = useState(false);
@@ -26,10 +31,13 @@ export const VisibilityTestComponent = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [headerVisible, setHeaderVisible] = useState(true);
   const navigate = useNavigate();
-
   useEffect(() => {
     const getCurrentUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
       setCurrentUserId(user?.id || null);
     };
     getCurrentUser();
@@ -137,14 +145,11 @@ export const VisibilityTestComponent = () => {
     }
   };
   if (isLoading) {
-    return <Card className="p-6">
-        <div className="text-center">Carregando configurações...</div>
-      </Card>;
+    return;
   }
   return <div className="space-y-6">
       {/* Header de Teste */}
-      {headerVisible && (
-      <Card className="p-6 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-200">
+      {headerVisible && <Card className="p-6 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-200">
         
 
         <div className="flex gap-4 flex-wrap justify-center">
@@ -153,57 +158,38 @@ export const VisibilityTestComponent = () => {
               {/* Toggle Público/Privado */}
               <div className="flex items-center gap-3 bg-gradient-to-r from-slate-50 to-gray-50 border border-gray-200 rounded-xl px-4 py-2 shadow-lg">
                 <Lock className={`w-4 h-4 ${!isPagePublic ? 'text-red-500' : 'text-gray-400'}`} />
-                <Switch
-                  checked={isPagePublic}
-                  onCheckedChange={togglePageVisibility}
-                  className="data-[state=checked]:bg-green-500"
-                />
+                <Switch checked={isPagePublic} onCheckedChange={togglePageVisibility} className="data-[state=checked]:bg-green-500" />
                 <Globe className={`w-4 h-4 ${isPagePublic ? 'text-green-500' : 'text-gray-400'}`} />
                 <span className={`text-sm font-medium ${isPagePublic ? 'text-green-600' : 'text-red-600'}`}>
                   {isPagePublic ? 'Público' : 'Privado'}
                 </span>
               </div>
 
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="flex items-center gap-2 bg-gradient-to-r from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 border-primary/20 hover:border-primary/40 text-primary hover:text-primary shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 rounded-xl px-4 py-2" 
-                onClick={async () => {
-                  try {
-                    if (!currentUserId) {
-                      toast.error("❌ Usuário não logado");
-                      return;
-                    }
-                    await navigator.clipboard.writeText(`${window.location.origin}/user/${currentUserId}`);
-                    toast.success("🔗 Link copiado!");
-                  } catch (error) {
-                    console.error('Erro ao copiar link:', error);
-                    toast.error("❌ Erro ao copiar link");
-                  }
-                }}
-              >
+              <Button size="sm" variant="outline" className="flex items-center gap-2 bg-gradient-to-r from-primary/5 to-accent/5 hover:from-primary/10 hover:to-accent/10 border-primary/20 hover:border-primary/40 text-primary hover:text-primary shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 rounded-xl px-4 py-2" onClick={async () => {
+            try {
+              if (!currentUserId) {
+                toast.error("❌ Usuário não logado");
+                return;
+              }
+              await navigator.clipboard.writeText(`${window.location.origin}/user/${currentUserId}`);
+              toast.success("🔗 Link copiado!");
+            } catch (error) {
+              console.error('Erro ao copiar link:', error);
+              toast.error("❌ Erro ao copiar link");
+            }
+          }}>
                 <Copy className="w-4 h-4" />
                 <span className="font-medium">Copy Link</span>
               </Button>
 
 
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="flex items-center gap-2 bg-gradient-to-r from-emerald-500/5 to-cyan-500/5 hover:from-emerald-500/10 hover:to-cyan-500/10 border-emerald-500/20 hover:border-emerald-500/40 text-emerald-600 hover:text-emerald-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 rounded-xl px-4 py-2" 
-                onClick={() => setShowGiftGallery(true)}
-              >
+              <Button size="sm" variant="outline" className="flex items-center gap-2 bg-gradient-to-r from-emerald-500/5 to-cyan-500/5 hover:from-emerald-500/10 hover:to-cyan-500/10 border-emerald-500/20 hover:border-emerald-500/40 text-emerald-600 hover:text-emerald-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 rounded-xl px-4 py-2" onClick={() => setShowGiftGallery(true)}>
                 <Eye className="w-4 h-4" />
                 <span className="font-medium">Mywishlist</span>
               </Button>
 
 
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="flex items-center gap-2 bg-gradient-to-r from-accent/5 to-secondary/5 hover:from-accent/10 hover:to-secondary/10 border-accent/20 hover:border-accent/40 text-accent hover:text-accent shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 rounded-xl px-4 py-2" 
-                onClick={() => navigate('/mylistpage')}
-              >
+              <Button size="sm" variant="outline" className="flex items-center gap-2 bg-gradient-to-r from-accent/5 to-secondary/5 hover:from-accent/10 hover:to-secondary/10 border-accent/20 hover:border-accent/40 text-accent hover:text-accent shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 rounded-xl px-4 py-2" onClick={() => navigate('/mylistpage')}>
                 <span className="text-lg">📋</span>
                 <span className="font-medium">MyPageList</span>
               </Button>
@@ -211,12 +197,7 @@ export const VisibilityTestComponent = () => {
               <div className="flex flex-col gap-1">
                 
                 <div className="flex flex-wrap gap-1">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="flex items-center gap-2 bg-gradient-to-r from-slate-500/5 to-gray-500/5 hover:from-slate-500/10 hover:to-gray-500/10 border-slate-500/20 hover:border-slate-500/40 text-slate-600 hover:text-slate-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 rounded-xl px-4 py-2" 
-                    onClick={() => setHeaderVisible(!headerVisible)}
-                  >
+                  <Button size="sm" variant="outline" className="flex items-center gap-2 bg-gradient-to-r from-slate-500/5 to-gray-500/5 hover:from-slate-500/10 hover:to-gray-500/10 border-slate-500/20 hover:border-slate-500/40 text-slate-600 hover:text-slate-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 rounded-xl px-4 py-2" onClick={() => setHeaderVisible(!headerVisible)}>
                     {headerVisible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     <span className="font-medium">{headerVisible ? 'Hide' : 'Show'}</span>
                   </Button>
@@ -224,8 +205,7 @@ export const VisibilityTestComponent = () => {
               </div>
             </>}
         </div>
-      </Card>
-      )}
+      </Card>}
 
       {/* Grid de Testes */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -245,10 +225,6 @@ export const VisibilityTestComponent = () => {
       {/* Dialog da Wishlist removido - agora está no MenuDropdown */}
       
       {/* Dialog da Galeria de Presentes */}
-      <GiftViewDialog 
-        open={showGiftGallery} 
-        onOpenChange={setShowGiftGallery}
-        items={wishlistItems}
-      />
+      <GiftViewDialog open={showGiftGallery} onOpenChange={setShowGiftGallery} items={wishlistItems} />
     </div>;
 };

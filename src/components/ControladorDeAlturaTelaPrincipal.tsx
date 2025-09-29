@@ -32,70 +32,106 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
   const [isOpen, setIsOpen] = useState(false);
   const lastClickTime = useRef(0);
   const isProcessing = useRef(false);
+
+  // Function to calculate responsive height based on viewport constraints
+  const calculateResponsiveHeight = useCallback((percentage: number) => {
+    try {
+      // Find reference elements
+      const followersElement = document.querySelector('[class*="followers"]') || 
+                              document.querySelector('[class*="seguidores"]') ||
+                              document.querySelector('button[class*="bg-secondary"]');
+      
+      const premiumElement = document.querySelector('[class*="premium"]') || 
+                            document.querySelector('button[class*="BE PREMIUM"]') ||
+                            document.querySelector('button[class*="bg-accent"]');
+
+      if (followersElement && premiumElement) {
+        const followersRect = followersElement.getBoundingClientRect();
+        const premiumRect = premiumElement.getBoundingClientRect();
+        
+        // Calculate available space between elements
+        const topOffset = Math.max(followersRect.bottom + 16, 120); // 16px margin + min 120px from top
+        const bottomOffset = Math.max(window.innerHeight - premiumRect.top + 16, 80); // 16px margin + min 80px from bottom
+        const availableHeight = window.innerHeight - topOffset - bottomOffset;
+        
+        // Apply percentage to available space
+        const calculatedHeight = Math.max(availableHeight * (percentage / 100), 200); // Min 200px
+        
+        console.log(`📐 Responsive Height: ${percentage}% = ${calculatedHeight}px (available: ${availableHeight}px)`);
+        return `${calculatedHeight}px`;
+      }
+      
+      // Fallback to viewport percentage if elements not found
+      return `${percentage}vh`;
+    } catch (error) {
+      console.warn('Error calculating responsive height:', error);
+      return `${percentage}vh`;
+    }
+  }, []);
   
   const heightOptions: HeightOption[] = [
     {
       id: 'full',
       name: 'Tela Cheia',
-      height: '100vh',
+      height: 'calc(100vh - 32px)', // Full height with small margin
       icon: Maximize2,
-      description: 'Tela principal ocupa todo o espaço visível'
+      description: 'Tela principal ocupa todo o espaço disponível'
     },
     {
       id: 'extra-large',
       name: 'Extra Grande', 
-      height: '95vh',
+      height: 'responsive-95',
       icon: ChevronsUp,
-      description: 'Tela principal ocupa quase toda altura da tela'
+      description: 'Tela principal ocupa quase todo espaço disponível'
     },
     {
       id: 'large',
       name: 'Grande',
-      height: '87vh',
+      height: 'responsive-87',
       icon: ArrowUp,
-      description: 'Tela principal ocupa maior parte da altura da tela'
+      description: 'Tela principal ocupa maior parte do espaço disponível'
     },
     {
       id: 'medium-large',
       name: 'Médio Grande',
-      height: '78vh',
+      height: 'responsive-78',
       icon: MoveVertical,
-      description: 'Tela principal ocupa 3/4 da altura da tela'
+      description: 'Tela principal ocupa 3/4 do espaço disponível'
     },
     {
       id: 'above-half',
       name: 'Acima da Metade',
-      height: '60vh',
+      height: 'responsive-65',
       icon: Monitor,
-      description: 'Tela principal ocupa 3/5 da altura da tela'
+      description: 'Tela principal ocupa mais da metade do espaço'
     },
     {
       id: 'half',
       name: 'Metade',
-      height: '50vh',
+      height: 'responsive-50',
       icon: Minus,
-      description: 'Tela principal ocupa metade da altura da tela'
+      description: 'Tela principal ocupa metade do espaço disponível'
     },
     {
       id: 'small-half',
       name: 'Abaixo da Metade',
-      height: '40vh',
+      height: 'responsive-40',
       icon: ArrowDown,
-      description: 'Tela principal ocupa 2/5 da altura da tela'
+      description: 'Tela principal ocupa menos da metade do espaço'
     },
     {
       id: 'small',
       name: 'Pequeno',
-      height: '30vh',
+      height: 'responsive-30',
       icon: ChevronsDown,
-      description: 'Tela principal ocupa 3/10 da altura da tela'
+      description: 'Tela principal ocupa 1/3 do espaço disponível'
     },
     {
       id: 'minimal',
       name: 'Mínimo',
-      height: '20vh',
+      height: 'responsive-20',
       icon: Minimize2,
-      description: 'Tela principal ocupa 1/5 da altura da tela'
+      description: 'Tela principal ocupa espaço mínimo'
     },
     {
       id: 'current',
@@ -108,14 +144,22 @@ export const ControladorDeAlturaTelaPrincipal: React.FC<ControladorDeAlturaTelaP
 
   const currentOption = heightOptions[currentOptionIndex];
 
-  // Optimized height change with smooth throttling
+  // Optimized height change with smooth throttling and responsive calculation
   const optimizedHeightChange = useCallback(
     throttle((height: string, optionName: string) => {
-      console.log(`🎛️ Height Controller: Applying height change to ${height} (${optionName})`);
-      onHeightChange(height);
+      let finalHeight = height;
+      
+      // Process responsive heights
+      if (height.startsWith('responsive-')) {
+        const percentage = parseInt(height.replace('responsive-', ''));
+        finalHeight = calculateResponsiveHeight(percentage);
+      }
+      
+      console.log(`🎛️ Height Controller: Applying height change to ${finalHeight} (${optionName})`);
+      onHeightChange(finalHeight);
       isProcessing.current = false;
     }, 100),
-    [onHeightChange, throttle]
+    [onHeightChange, throttle, calculateResponsiveHeight]
   );
 
   const handleHeightSelect = useCallback((option: HeightOption, index: number) => {

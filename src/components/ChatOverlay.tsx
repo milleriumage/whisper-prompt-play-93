@@ -17,7 +17,7 @@ import { OnlineUsersDialog } from "@/components/OnlineUsersDialog";
 import { GuestProfileDialog } from './GuestProfileDialog';
 import { useGuestData } from '@/hooks/useGuestData';
 import { useRealtimeMessages } from '@/hooks/useRealtimeMessages';
-import { useDraggableWindow } from '@/hooks/useDraggableWindow';
+import { useMobileDraggable } from '@/hooks/useMobileDraggable';
 import { ResizeHandles } from './ResizeHandles';
 import { ChatGiftSelector } from './ChatGiftSelector';
 import { ChatGiftMessage } from './ChatGiftMessage';
@@ -66,15 +66,15 @@ export const ChatOverlay = ({
   const [showGiftOpen, setShowGiftOpen] = useState(false);
 
   const {
-    windowRef,
-    windowStyle,
+    elementRef: windowRef,
+    elementStyle: windowStyle,
+    dragHandleProps,
     isDragging,
-    isResizing,
-    handleDragStart,
-    handleResizeStart,
+    isMobile,
     resetWindow,
     centerWindow,
-  } = useDraggableWindow({
+    snapToEdge
+  } = useMobileDraggable({
     initialPosition: { x: window.innerWidth - 340, y: 16 },
     initialSize: { width: 320, height: 400 },
     minSize: { width: 280, height: 300 },
@@ -329,13 +329,10 @@ export const ChatOverlay = ({
       <div className={`flex flex-col overflow-hidden shadow-xl relative ${config.fleffyMode ? 'bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 border-2 border-pink-200 rounded-3xl shadow-pink-100/50 shadow-2xl' : config.glassMorphism ? 'bg-white/10 backdrop-blur-xl border border-white/30 rounded-2xl shadow-lg' : isMinimalTheme ? 'bg-white border border-gray-200 rounded-xl' : 'bg-card/95 backdrop-blur-md border border-border/50 rounded-2xl'} ${isDragging ? 'shadow-2xl scale-105' : ''} transition-all duration-200`} 
         style={{ height: '100%', backgroundColor: config.chatBackgroundColor !== "transparent" ? config.chatBackgroundColor : undefined }}>
         
-        {/* Resize Handles */}
-        <ResizeHandles onResizeStart={handleResizeStart} />
-        
         {/* Header */}
         <div 
-          className={`flex items-center justify-between p-2 border-b cursor-move select-none ${config.fleffyMode ? 'border-pink-200/50 bg-gradient-to-r from-pink-50/80 to-purple-50/80' : isMinimalTheme ? 'border-gray-200 bg-gray-50' : 'border-border/30 bg-muted/30'}`}
-          onMouseDown={handleDragStart}
+          className={`flex items-center justify-between p-2 border-b cursor-move select-none ${config.fleffyMode ? 'border-pink-200/50 bg-gradient-to-r from-pink-50/80 to-purple-50/80' : isMinimalTheme ? 'border-gray-200 bg-gray-50' : 'border-border/30 bg-muted/30'} ${isMobile ? 'touch-none' : ''}`}
+          {...dragHandleProps}
         >
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>

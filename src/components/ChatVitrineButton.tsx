@@ -425,11 +425,11 @@ export const ChatVitrineButton: React.FC<ChatVitrineButtonProps> = ({
                   size="sm" 
                   variant="ghost" 
                   onClick={() => {
+                    // Apenas fecha o overlay sem desativar o botão Chat Vitrine
                     setShowChatOverlay(false);
-                    onToggle?.(false);
                   }} 
                   className="h-6 w-6 p-0 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors"
-                  title="Fechar Chat Vitrine"
+                  title="Fechar Chat (botão permanece ativo)"
                 >
                   <X className="w-3 h-3" />
                 </Button>

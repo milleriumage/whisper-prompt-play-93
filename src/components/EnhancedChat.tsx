@@ -448,11 +448,11 @@ export const EnhancedChat = ({
           ))}
         </div>
 
-        {/* Input minimizado responsivo para todas as telas */}
+        {/* Input minimizado responsivo centralizado acima do menu horizontal */}
         <div className={`fixed z-50 bg-background/95 backdrop-blur-sm border rounded-2xl shadow-lg transition-all duration-300 ${
           isMobile 
-            ? 'bottom-4 left-4 right-4 max-w-none' // Mobile: full width with margins
-            : 'bottom-4 right-4 w-80' // Desktop: fixed width
+            ? 'bottom-20 left-1/2 -translate-x-1/2 w-80 max-w-[calc(100vw-32px)]' // Mobile: centralizado acima do menu
+            : 'bottom-20 left-1/2 -translate-x-1/2 w-80' // Desktop: centralizado acima do menu
         }`}>
           <div className="p-3">
             <div className="flex gap-2 items-center">
